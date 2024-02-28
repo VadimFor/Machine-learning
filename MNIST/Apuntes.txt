@@ -1,0 +1,49 @@
+GENERAL
+-------------------------------
+-Cada perceptrón se conecta con todas las neuronas de la capa anterior, ponderando cada una	
+	de estas conexiones por un peso y añadiendo un bias.
+	
+-El optimizador Adam es uno de los que habitualmente reporta mejores resultados sin requerir
+	una configuración extra de sus parámetros.
+	
+-En tareas de clasificación se usa la entropía cruzada categórica como función de pérdida.
+
+-La partición de validación no se utiliza para el ajuste de los pesos, sino que una vez finalizada
+	cada época se utiliza el modelo obtenido con esos datos y se calcula el error cometido.
+
+KERAS
+---------------------------------
+-Las imagenes tienen que ser redimensionadas a vectores de una sola dimensión (tam 784),
+	para poder ser utilizadas en un perceptrón multicapa.
+
+-En keras solo es necesario especificar las dimensiones de los datos de entrada de la primera capa
+	pero en el resto no es necesario (algo que sí lo es en pytoch).
+
+
+-La capa salida tendrá tantas neuronas como número posible de resultados.
+	Si buscamos clasificar una imaagen de un número del 0 al 9 entonces la capa de salida
+	tiene que tener 10 neuronas.
+	
+-En keras, es (creo que necesario siempre) pasar las etiquetas de las imagenes a one-hot
+	para evitar sesgos. Es decir: 3 -> [0 0 0 1 0 0 0 0 0 0], 2-> [0 0 1 0 0 0 0 0 0 0], etc.
+	
+	Si queremos utilizar las etiquetas sin convertirlas a one-hot hay que utilizar la función de
+	pérdida tf.keras.SparseCategoricalCrossentropy.
+	
+-En keras se puede guardar tanto el modelo como los pesos (en pytorch solo pesos).
+	
+PYTORCH
+-----------------------------------
+
+-En pytorch es necesario especificar la dimensión de entrada en todas las capas de la red mediante
+	el parametro in_features.
+	
+-En pytorch no se preproceaa el etiquetado de los datos para convertirlos a one-hot, esto se debe
+	a la función de pérdida que utiliza pytorch (entropía cruzada categórica) la cual utiliza las etiquetas
+	en su formato números y no requiere el uso de la función de activación softmax a la salida de la red.
+	Esto se debe a que internamente se encarga de realizar la conversión one-hot y de aplicar dicha función.
+	
+-En pytorch solo se pueden guardar los pesos. (en keras modelo y pesos).
+
+-Pytorch no cuenta con un método como keras que proporciona una visualización detallada de la arquitectura
+	de red por lo que hay que recurrir a librerías como torchinfo o torchsummary.
