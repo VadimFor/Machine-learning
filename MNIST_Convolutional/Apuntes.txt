@@ -1,0 +1,20 @@
+GENERAL
+----------------------------------------
+
+-Las capas intermedias suelen emplear la función de activación ReLU
+-En clasificación de imágenes se suele emplear softmax para la capa de salida.
+
+
+
+KERAS
+-------------------------------------------
+
+
+
+
+
+PYTORCH
+--------------------------------------------
+
+-Una de las principales diferencias entre keras y pytorch en CNN es que pytorch espera que la	
+	primera dimensión de los datos (sin contar la dimensión del batch) indique el número de canales.
