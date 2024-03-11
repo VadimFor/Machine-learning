@@ -117,6 +117,15 @@ None
 
 #█▀█ ▄▀█ █▀ █▀█  ▀█ ▀   █▀▀ █▄░█ ▀█▀ █▀█ █▀▀ █▄░█ ▄▀█ █▀█   █▀▄▀█ █▀█ █▀▄ █▀▀ █░░ █▀█
 #█▀▀ █▀█ ▄█ █▄█  ▄█ ▄   ██▄ █░▀█ ░█░ █▀▄ ██▄ █░▀█ █▀█ █▀▄   █░▀░█ █▄█ █▄▀ ██▄ █▄▄ █▄█
+
+
+''' [SGD = Stochastic Gradient Descent]
+En el contexto del entrenamiento de modelos de aprendizaje profundo, como las redes 
+neuronales, el uso de un optimizador es fundamental pero no necesariamente obligatorio. 
+Sin embargo, es altamente recomendado, ya que sin un optimizador, el modelo no tendría 
+una forma de ajustar sus parámetros durante el entrenamiento para minimizar la función 
+de pérdida y mejorar su rendimiento.
+'''
 model.compile(loss='binary_crossentropy',
               optimizer='sgd',
               metrics=['accuracy'])
