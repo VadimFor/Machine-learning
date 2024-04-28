@@ -6,6 +6,9 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.models import load_model
 from tensorflow.keras import layers, models
 from sklearn.metrics import classification_report
+import json
+import time
+
 
 import os
 import numpy as np
@@ -96,8 +99,6 @@ print(f'Tamaño del conjunto de test: {len(x_test)}')
 #█▀█ ▄▀█ █▀ █▀█   ▀█ ▀   █▀▄ █▀▀ █▀▀ █ █▄░█ █ █▀█   ▄▀█ █▀█ █▀█ █░█ █ ▀█▀ █▀▀ █▀▀ ▀█▀ █░█ █▀█ ▄▀█
 #█▀▀ █▀█ ▄█ █▄█   █▄ ▄   █▄▀ ██▄ █▀░ █ █░▀█ █ █▀▄   █▀█ █▀▄ ▀▀█ █▄█ █ ░█░ ██▄ █▄▄ ░█░ █▄█ █▀▄ █▀█
 
-
-'''
 model = models.Sequential()
 model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(512, 512, 1)))
 model.add(layers.MaxPooling2D((2, 2)))
@@ -111,13 +112,14 @@ model.add(layers.Flatten())
 model.add(layers.Dropout(0.5))  # Para evitar/reducir overfitting
 model.add(layers.Dense(512, activation='relu'))
 model.add(layers.Dense(1, activation='sigmoid')) 
+
 '''
 model = models.Sequential([
     layers.Conv2D(32, (3, 3), activation='relu', input_shape=(512, 512, 1)),
     layers.MaxPooling2D((2, 2)),
     layers.Flatten(),
     layers.Dense(1, activation='sigmoid')
-])
+])'''
 
 #█▀█ ▄▀█ █▀ █▀█  ▀█ ▀   █▀▀ █▄░█ ▀█▀ █▀█ █▀▀ █▄░█ ▄▀█ █▀█   █▀▄▀█ █▀█ █▀▄ █▀▀ █░░ █▀█
 #█▀▀ █▀█ ▄█ █▄█  ▄█ ▄   ██▄ █░▀█ ░█░ █▀▄ ██▄ █░▀█ █▀█ █▀▄   █░▀░█ █▄█ █▄▀ ██▄ █▄▄ █▄█
@@ -130,7 +132,23 @@ model.compile(optimizer='adam',
 # Resumen del modelo
 model.summary()
 
+start_time = time.time()
 history = model.fit(x_train, y_train, epochs=10, batch_size=32, validation_data=(x_test, y_test))
+end_time = time.time()
+
+elapsed_time = (end_time - start_time) / 60 
+print(f"Entrenamiento completado en {elapsed_time:.2f} minutos.")
+
+## GUARDAR HISTORY ##
+history_dict = history.history
+with open('history_tb_model_2.json', 'w') as f:
+    json.dump(history_dict, f)
+    
+
+#LEER HISTORY
+#with open('history.json', 'r') as f:
+#    loaded_history = json.load(f)
+
 
 #█▀█ ▄▀█ █▀ █▀█   █░█ ▀   █▀█ █▀▀ █▀ █░█ █░░ ▀█▀ ▄▀█ █▀▄ █▀█ █▀   █▄█   █▀█ █▀█ █▀▀ █▀▄ █ █▀▀ █▀▀ █ █▀█ █▄░█
 #█▀▀ █▀█ ▄█ █▄█   ▀▀█ ▄   █▀▄ ██▄ ▄█ █▄█ █▄▄ ░█░ █▀█ █▄▀ █▄█ ▄█   ░█░   █▀▀ █▀▄ ██▄ █▄▀ █ █▄▄ █▄▄ █ █▄█ █░▀█
