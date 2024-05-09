@@ -6,12 +6,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import visualizacion
 
+from sklearn.utils import class_weight
+
 ######################################################################################################################################################
 #█▀█ █▄▄ ▀█▀ █▀▀ █▄░█ █▀▀ █▀█   █▄█   ▀█▀ █▀█ ▄▀█ █▄░█ █▀ █▀▀ █▀█ █▀█ █▀▄▀█ ▄▀█ █▀█   █▀▄ ▄▀█ ▀█▀ █▀█ █▀
 #█▄█ █▄█ ░█░ ██▄ █░▀█ ██▄ █▀▄   ░█░   ░█░ █▀▄ █▀█ █░▀█ ▄█ █▀░ █▄█ █▀▄ █░▀░█ █▀█ █▀▄   █▄▀ █▀█ ░█░ █▄█ ▄█
-carpeta_principal = "dataset_tuberculosis" # Carpeta contenedora  de los datasets
+carpeta_principal = "C:/Users/vadim/Desktop/TFG/dataset_Tuberculosis" # Carpeta contenedora  de los datasets
 
 def procesar_imagenes(subcarpeta):
+
     imagenes = [] 
     etiquetas = []
     subcarpeta_dir = os.path.join(carpeta_principal, subcarpeta) #'dataset_tuberculosis/Normal' y 'dataset_tuberculosis/Tuberculosis'
@@ -54,8 +57,13 @@ def obtener_train_test(dimensiones = 0):
     # Divido 80 (train) - 20  para el conjunto de fotos Tuberculosis
     x_train_tuberculosis, x_test_tuberculosis, y_train_tuberculosis, y_test_tuberculosis = train_test_split(x_train_tuberculosis, y_train_tuberculosis, test_size=0.2, random_state=42, stratify=y_train_tuberculosis)
 
+    #▀█▀ ▄▀█ █▀█ █▀▀ ▄▀█   █▀▀ ▄█
+    #░█░ █▀█ █▀▄ ██▄ █▀█   █▀░ ░█
+    x_train_tuberculosis = x_train_tuberculosis[:40]
+    y_train_tuberculosis = y_train_tuberculosis[:40]
+
     if dimensiones == 1:
-        visualizacion.mostrarDimensiones(x_train_normal,y_train_normal,x_train_tuberculosis,y_train_tuberculosis)
+        visualizacion.mostrarDimensiones(x_train_normal,y_train_normal,x_test_normal,x_train_tuberculosis,y_train_tuberculosis,x_test_tuberculosis)
 
     # Concatenar los conjuntos de evaluación de ambas clases
     x_test = np.concatenate((x_test_normal, x_test_tuberculosis), axis=0)
@@ -65,10 +73,15 @@ def obtener_train_test(dimensiones = 0):
     x_train = np.concatenate((x_train_normal, x_train_tuberculosis), axis=0)
     y_train = np.concatenate((y_train_normal, y_train_tuberculosis), axis=0)
     
-    if dimensiones == 1:
-        print(f'Tamaño del conjunto de entrenamiento: {len(x_train)}')
-        print(f'Tamaño del conjunto de test: {len(x_test)}')
     
-    return x_train, y_train, x_test, y_test
+    #█▀▀ █░░ ▄▀█ █▀ █▀   █░█░█ █▀▀ █ █▀▀ █░█ ▀█▀
+    #█▄▄ █▄▄ █▀█ ▄█ ▄█   ▀▄▀▄▀ ██▄ █ █▄█ █▀█ ░█░
+    weights = class_weight.compute_class_weight('balanced', classes=np.unique(y_train), y=y_train)
+    class_weights = dict(enumerate(weights))
+    
+    if dimensiones == 1:
+        print(f'Tamaño del conjunto de entrenamiento: {len(x_train)} & Tamaño del conjunto de test: {len(x_test)}')   
+    
+    return x_train, y_train, x_test, y_test,class_weights
 
 

@@ -6,7 +6,6 @@ def guardar_history(history):
         json.dump(history_dict, f)  
         
 def cargar_history():
-    
     with open('history.json', 'r') as f:
         return json.load(f)
         
