@@ -8,6 +8,8 @@ import visualizacion
 
 from sklearn.utils import class_weight
 
+import random
+
 ######################################################################################################################################################
 #█▀█ █▄▄ ▀█▀ █▀▀ █▄░█ █▀▀ █▀█   █▄█   ▀█▀ █▀█ ▄▀█ █▄░█ █▀ █▀▀ █▀█ █▀█ █▀▄▀█ ▄▀█ █▀█   █▀▄ ▄▀█ ▀█▀ █▀█ █▀
 #█▄█ █▄█ ░█░ ██▄ █░▀█ ██▄ █▀▄   ░█░   ░█░ █▀▄ █▀█ █░▀█ ▄█ █▀░ █▄█ █▀▄ █░▀░█ █▀█ █▀▄   █▄▀ █▀█ ░█░ █▄█ ▄█
@@ -43,6 +45,8 @@ def normalizar_imagenes(imagenes,etiquetas):
     
     return x_train,y_train
 
+
+
 def obtener_train_test(dimensiones = 0):
     
     imagenes_normal , etiquetas_normal = procesar_imagenes("Normal")
@@ -59,9 +63,24 @@ def obtener_train_test(dimensiones = 0):
 
     #▀█▀ ▄▀█ █▀█ █▀▀ ▄▀█   █▀▀ ▄█
     #░█░ █▀█ █▀▄ ██▄ █▀█   █▀░ ░█
-    x_train_tuberculosis = x_train_tuberculosis[:40]
-    y_train_tuberculosis = y_train_tuberculosis[:40]
-
+    #x_train_tuberculosis = x_train_tuberculosis[:3]
+    #y_train_tuberculosis = y_train_tuberculosis[:3]
+    
+    #█▀█ █░█ █▀▀ █▀█ █▀ ▄▀█ █▀▄▀█ █▀█ █░░ █▀▀
+    #█▄█ ▀▄▀ ██▄ █▀▄ ▄█ █▀█ █░▀░█ █▀▀ █▄▄ ██▄ 
+    '''
+    num_samples_minority = len(x_train_tuberculosis)
+    additional_samples_needed = len(x_train_normal) - num_samples_minority
+    
+    num_repeats = additional_samples_needed // num_samples_minority
+    remaining_samples = additional_samples_needed % num_samples_minority
+    
+    x_train_tuberculosis_resampled = np.tile(x_train_tuberculosis, (num_repeats, 1, 1, 1))
+    y_train_tuberculosis_resampled = np.tile(y_train_tuberculosis, (num_repeats))
+    
+    x_train_tuberculosis = np.concatenate((x_train_tuberculosis_resampled,x_train_tuberculosis, x_train_tuberculosis[:remaining_samples]), axis=0)
+    y_train_tuberculosis = np.concatenate((y_train_tuberculosis_resampled,y_train_tuberculosis, y_train_tuberculosis[:remaining_samples]), axis=0)
+    '''
     if dimensiones == 1:
         visualizacion.mostrarDimensiones(x_train_normal,y_train_normal,x_test_normal,x_train_tuberculosis,y_train_tuberculosis,x_test_tuberculosis)
 
@@ -72,7 +91,7 @@ def obtener_train_test(dimensiones = 0):
     # Concatenar los conjuntos de entrenamiento de ambas clases
     x_train = np.concatenate((x_train_normal, x_train_tuberculosis), axis=0)
     y_train = np.concatenate((y_train_normal, y_train_tuberculosis), axis=0)
-    
+   
     
     #█▀▀ █░░ ▄▀█ █▀ █▀   █░█░█ █▀▀ █ █▀▀ █░█ ▀█▀
     #█▄▄ █▄▄ █▀█ ▄█ ▄█   ▀▄▀▄▀ ██▄ █ █▄█ █▀█ ░█░

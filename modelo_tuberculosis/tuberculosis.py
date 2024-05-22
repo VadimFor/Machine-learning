@@ -6,6 +6,15 @@ from tensorflow.keras.models import load_model
 import time
 import numpy as np
 import tensorflow as tf
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+from tensorflow.keras.preprocessing import image
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import keras
+import cv2  # Import cv2 for image processing
+from tensorflow.keras.models import Model
+from PIL import Image
 
 LOAD_MODEL = False
 
@@ -45,7 +54,7 @@ if LOAD_MODEL==False:
 
     #█▀█ ▄▀█ █▀ █▀█  ▀█ ▀   █▀▀ █▄ █ ▀█▀ █▀█ █▀▀ █▄ █ ▄▀█ █▀█   █▀▄▀█ █▀█ █▀▄ █▀▀ █░░ █▀█
     #█▀▀ █▀█ ▄█ █▄█  ▄█ ▄   ██▄ █░▀█ ░█░ █▀▄ ██▄ █ ▀█ █▀█ █▀▄   █░▀░█ █▄█ █▄▀ ██▄ █▄▄ █▄█
-
+    
     # Compilar el modelo
     model.compile(optimizer='adam',
                 loss='binary_crossentropy',
@@ -60,22 +69,22 @@ if LOAD_MODEL==False:
     
     #CLASS WEIGHTS
     #history = model.fit(x_train, y_train, epochs=10, batch_size=32, validation_data=(x_test, y_test), class_weight=class_weights)
-
     
     end_time = time.time()
 
     elapsed_time = (end_time - start_time) / 60 
     print(f"Entrenamiento completado en {elapsed_time:.2f} minutos.")
     
+   
     #█▀▀ █░█ ▄▀█ █▀█ █▀▄ ▄▀█ █▀█   █▀▄▀█ █▀█ █▀▄ █▀▀ █░░ █▀█
     #█▄█ █▄█ █▀█ █▀▄ █▄▀ █▀█ █▀▄   █░▀░█ █▄█ █▄▀ ██▄ █▄▄ █▄█
 
-    model.save('cw_tb_modelo_40')
+    model.save('tb_modelo_basic_560')
     
     #█░█ █ █▀ ▀█▀ █▀█ █▀█ █▄█
     #█▀█ █ ▄█ ░█░ █▄█ █▀▄ ░█░
 
-    auxiliares.guardar_history(history) #ＧＵＡＲＤＡＲ
+    #auxiliares.guardar_history(history) #ＧＵＡＲＤＡＲ
 
     #history = auxiliares.cargar_history #ＣＡＲＧＡＲ
     
@@ -88,50 +97,36 @@ if LOAD_MODEL==False:
 
     visualizacion.mostrar_grafico_accuracy(history)
     visualizacion.mostrar_grafico_loss(history)
+    
+    y_pred = (model.predict(x_test) > 0.5).astype("int32")
+    cm = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Normal", "Tuberculosis"])
+    disp.plot(cmap=plt.cm.Blues)
+    plt.show()
 
 
 
-
-
-
-
-
-
-
-
-
-
- 
 
 if LOAD_MODEL==True:
         
     #█▀▀ ▄▀█ █▀█ █▀▀ ▄▀█ █▀█   █▀▄▀█ █▀█ █▀▄ █▀▀ █░░ █▀█
     #█▄▄ █▀█ █▀▄ █▄█ █▀█ █▀▄   █░▀░█ █▄█ █▄▀ ██▄ █▄▄ █▄█
 
-    model = load_model('tb_modelo')
+    model = load_model('tb_modelo_basic_560')
     print("¡Modelo cargado satisfactoriamente!")
     model.summary()
 
     ##########################################################################################
 
-    from tensorflow.keras.preprocessing import image
-    import matplotlib.pyplot as plt
-    import matplotlib.cm as cm
-    import keras
-    import cv2  # Import cv2 for image processing
-    from tensorflow.keras.models import Model
-    from PIL import Image
     def GradCAM(model, image, interpolant=0.5, plot_results=True):
         image = tf.image.rgb_to_grayscale(image)
         
         original_img = np.asarray(image, dtype=np.float32)
         img = np.expand_dims(original_img, axis=0)
 
-        # Predict
         prediction = model.predict(img)
         prediction_idx = np.argmax(prediction)
-
-        # Find the last convolutional layer
+  
         last_conv_layer = None
         for layer in reversed(model.layers):
             if isinstance(layer, tf.keras.layers.Conv2D):
@@ -141,10 +136,8 @@ if LOAD_MODEL==True:
         if last_conv_layer is None:
             raise ValueError("No convolutional layer found in the model.")
 
-        # Create a model to extract feature maps and predictions
         gradient_model = Model(inputs=model.inputs, outputs=[last_conv_layer.output, model.output])
 
-        # Compute gradient of top predicted class
         with tf.GradientTape() as tape:
             conv2d_out, predictions = gradient_model(img)
             loss = predictions[:, prediction_idx]
@@ -172,15 +165,24 @@ if LOAD_MODEL==True:
         if plot_results:
             plt.imshow(np.uint8(original_img * interpolant + cvt_heatmap * (1 - interpolant)))
             plt.title(f'Clase predicha: {"Tuberculosis" if prediction.max() > 0.5  else "Normal"}')
-            plt.show()  # This will keep the plot open until you close it manually
+            plt.show()  
         else:
             return cvt_heatmap
 
-    # Example of how to use the updated GradCAM function
-    test_img = Image.open("C:/Users/vadim/Desktop/TFG/dataset_Tuberculosis/Tuberculosis/Tuberculosis-00.png")
+    '''
+    test_img = Image.open("C:/Users/vadim/Desktop/TFG/dataset_Tuberculosis/Tuberculosis/Tuberculosis-0.png")
     test_img = test_img.convert("RGB")    
     test_img = test_img.resize((512, 512))  
     test_img = np.array(test_img) / 255.0   # Normalize pixel values to [0, 1]
                 
     # Preprocessed image into GradCAM
-    GradCAM(model, test_img, plot_results=True)
+    #GradCAM(model, test_img, plot_results=True)'''
+    
+
+    # Confusion Matrix
+    x_train, y_train, x_test, y_test, class_weights = datos.obtener_train_test(1)
+    y_pred = (model.predict(x_test) > 0.5).astype("int32")
+    cm = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Normal", "Tuberculosis"])
+    disp.plot(cmap=plt.cm.Blues)
+    plt.show()
